@@ -1,4 +1,4 @@
-package br.com.classapp.AVC;
+package io.cmichel.boilerplate;
 
 import android.widget.Toast;
 
@@ -9,19 +9,18 @@ import com.facebook.react.bridge.ReactMethod;
 import java.util.HashMap;
 import java.util.Map;
 
-
-public class AVCModule extends ReactContextBaseJavaModule {
+public class Module extends ReactContextBaseJavaModule {
 
   private static final String DURATION_SHORT_KEY = "SHORT";
   private static final String DURATION_LONG_KEY = "LONG";
 
-  public AVCModule(ReactApplicationContext reactContext) {
+  public Module(ReactApplicationContext reactContext) {
     super(reactContext);
   }
 
   @Override
   public String getName() {
-    return "AVC";
+    return "Boilerplate";
   }
 
   @Override

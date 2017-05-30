@@ -1,144 +1,71 @@
-# React Native Sensitive Info
+## React Native Android Library Boilerplate
+This project serves as a boilerplate to create custom React Native native modules that can later be installed through NPM and easily be used in production.
 
-[![npm version](https://badge.fury.io/js/react-native-avc.svg)](https://badge.fury.io/js/react-native-avc)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Open Source Love](https://badges.frapsoft.com/os/v2/open-source.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
+## Getting started
+1. Clone the project
+2. Customize the project name by doing the following:
+    * Edit `author` and `name` in `package.json`
+    * Customize the Java package name (`com.domain.package`) as follows:
+        1. Modify it in `android/src/main/AndroidManifest.xml`.
+        2. Rename the folders starting from `android/src/main/java` to match your package name.
+        3. Adjust `package io.cmichel.boilerplate;` in the top of the `Module.java` and `Package.java` files in `android/src/main//java/package/path` to match it.
+    * Edit the name of your module in 
 
+        ```java
+        @Override
+        public String getName() {
+            return "Boilerplate";
+        }
+        ```
 
-**react-native-avc**  is the next generation of [react-native-get-shared-prefs](https://www.npmjs.com/package/react-native-get-shared-prefs).
+        and adjust it in `index.android.js`
+3. Modify/Build the Project in Android Studio
+    * Start `Android Studio` and select `File -> New -> Import Project` and select the **android** folder of this package.
+    * If you get a `Plugin with id 'android-library' not found` Error, install `android support repository`.
+    * If you get asked to upgrade _gradle_ to a new version, you can skip it.
 
-# Introduction
+## Installing it as a library in your main project
+There are many ways to do this, here's the way I do it:
 
-`react-native-avc` manages all data stored in Android Shared Preferences and iOS Keychain. You can set and get all key/value using simple methods.
+1. Push it to **GitHub**.
+2. Do `npm install --save git+https://github.com/MrToph/react-native-android-library-boilerplate.git` in your main project.
+3. Link the library:
+    * Add the following to `android/settings.gradle`:
+        ```
+        include ':react-native-android-library-boilerplate'
+        project(':react-native-android-library-boilerplate').projectDir = new File(settingsDir, '../node_modules/react-native-android-library-boilerplate/android')
+        ```
 
+    * Add the following to `android/app/build.gradle`:
+        ```xml
+        ...
 
-| RN SensitiveInfo Version | Description                      |
-|--------------------------|----------------------------------|
-| 4.0+                     | Compatible with RN 0.40+         |
-| <= 3.0.2                 | Compatible with RN 0.40 or below |
+        dependencies {
+            ...
+            compile project(':react-native-android-library-boilerplate')
+        }
+        ```
+    * Add the following to `android/app/src/main/java/**/MainApplication.java`:
+        ```java
+        package com.motivation;
 
-# Install
+        import io.cmichel.boilerplate.Package;  // add this for react-native-android-library-boilerplate
 
-Install `react-native-avc` using:
+        public class MainApplication extends Application implements ReactApplication {
 
-``npm i -S react-native-avc`` or ``yarn add react-native-avc``
+            @Override
+            protected List<ReactPackage> getPackages() {
+                return Arrays.<ReactPackage>asList(
+                    new MainReactPackage(),
+                    new Package()     // add this for react-native-android-library-boilerplate
+                );
+            }
+        }
+        ```
+4. Simply `import/require` it by the name defined in your library's `package.json`:
 
-## Linking project
-
-### Automatically
-
-`react-native link react-native-avc`
-
-### Manually
-
-#### iOS
-
-In XCode, in the project navigator:
-
-* Right click Libraries
-* Add Files to [your project's name]
-* Go to node_modules/react-native-avc
-* Add the .xcodeproj file
-
-In XCode, in the project navigator, select your project.
-
-* Add the libRNSensitiveInfo.a from the RNSensitiveInfo project to your project's Build Phases ➜ Link Binary With Libraries
-* Click .xcodeproj file you added before in the project navigator and go the Build Settings tab. Make sure 'All' is toggled on (instead of 'Basic').
-* Look for Header Search Paths and make sure it contains both $(SRCROOT)/../react-native/React and $(SRCROOT)/../../React - mark both as recursive. (Should be OK by default.)
-
-Run your project (Cmd+R)
-
-#### Android
-
-Go to `settings.gradle` inside your android project folder and paste this lines there:
-
-```java
-include ':react-native-avc'
-
-project(':react-native-avc').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-avc/android')
-```
-
-and paste it into `build.gradle`:
-
-```java
-compile project(':react-native-avc')
-```
-
-In your `MainApplication.java` add:
-```java
-import br.com.classapp.RNSensitiveInfo.RNSensitiveInfoPackage; //<- You must import this
-
-protected List<ReactPackage> getPackages() {
-    return Arrays.<ReactPackage>asList(
-        new MainReactPackage(),
-        new RNSensitiveInfoPackage(), // <- Add this line
-    );
-}
-```
-
-Sync gradle and go :)
-
-# Methods
-
-We unified our library's methods to bring more efficiency and simplify the usability for other developers. We hope that you enjoy it. :)
-
-`setItem(key, value, options)`: You can insert data into shared preferences & keychain using this promise method.
-
-`getItem(key, options)`: This promise will get value from given key.
-
-`deleteItem(key, options)`: It will delete value from given key
-
-`getAllItems(options)`: Will retrieve all keys and values from Shared Preferences & Keychain
-
-"Options" is a new parameter (optional) that you can pass to our methods. But what does it do? Now, you can select which keychain's service (iOS) and shared preferences's name (android) you can use. To do so:
-
-```javascript
-SInfo.setItem('key1', 'value1', {
-sharedPreferencesName: 'mySharedPrefs',
-keychainService: 'myKeychain'});
-```
-
-But if you prefer to not use it, our default sharedPreferencesName is: **shared_preferences** and keychainService is: **app**. For that, use:
-
-```javascript
-SInfo.setItem('key1', 'value1', {});
-```
-
-If you used Android's getDefaultSharedPreferences in your project the shared preference's name that you are looking for is: **com.mypackage.MyApp_preferences**. In other hands if you used iOS's Keychain the default service is: **app** which is our default too.
-
-# How to use?
-
-Here is a simple example:
-
-```javascript
-import SInfo from 'react-native-avc';
-
-SInfo.setItem('key1', 'value1', {
-sharedPreferencesName: 'mySharedPrefs',
-keychainService: 'myKeychain'
-}).then((value) =>
-        console.log(value) //value 1
-);
-
-SInfo.setItem('key2', 'value2', {});
-
-SInfo.getItem('key1', {
-sharedPreferencesName: 'mySharedPrefs',
-keychainService: 'myKeychain'}).then(value => {
-    console.log(value) //value1
-});
-
-SInfo.getItem('key2',{}).then(value => {
-    console.log(value) //value2
-});
-
-SInfo.getAllItems({
-sharedPreferencesName: 'mySharedPrefs',
-keychainService: 'myKeychain'}).then(values => {
-    console.log(values) //value1, value2
-});
-```
-
-# Contributing
-
-Pull requests are always welcome :)
+    ```javascript
+    import Boilerplate from 'react-native-android-library-boilerplate'
+    Boilerplate.show('Boilerplate runs fine', Boilerplate.LONG)
+    ```
+5. You can test and develop your library by importing the `node_modules` library into **Android Studio** if you don't want to install it from _git_ all the time.
